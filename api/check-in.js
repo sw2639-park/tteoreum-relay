@@ -22,15 +22,11 @@ export default async function handler(req, res) {
 
   const subscription = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
-  // 일요일(KST) 여부
-  const nowKST = new Date(Date.now() + 9 * 3600 * 1000);
-  const isSunday = nowKST.getUTCDay() === 0;
-
-  const payload = JSON.stringify({ type: 'check-in', weeklySummary: isSunday });
+  const payload = JSON.stringify({ type: 'check-in' });
 
   try {
     await webpush.sendNotification(subscription, payload);
-    return res.status(200).json({ ok: true, isSunday });
+    return res.status(200).json({ ok: true });
   } catch (err) {
     if (err.statusCode === 410) {
       await redis.del('push_subscription');
